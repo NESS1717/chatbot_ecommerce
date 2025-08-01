@@ -9,6 +9,8 @@ on:
 jobs:
   test-backend:
     runs-on: ubuntu-latest
+    env:
+      HUGGINGFACE_TOKEN: ${{ secrets.HUGGINGFACE_TOKEN }}
 
     steps:
     - name: Checkout code
