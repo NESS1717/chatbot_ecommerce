@@ -21,16 +21,19 @@ def test_register_and_login():
     assert "token" in json.loads(login_resp.data)
 
 
-def test_protected_chat():
+from unittest.mock import patch
+
+@patch("services.chat.send_to_huggingface")
+def test_protected_chat(mock_huggingface):
+    mock_huggingface.return_value = "Respuesta simulada"
+
     client = app.test_client()
 
-    # Registrar (si no existe)
     client.post("/users/register", json={
         "username": "testuser",
         "password": "testpass"
     })
 
-    # Login
     login_resp = client.post("/users/login", json={
         "username": "testuser",
         "password": "testpass"
@@ -39,14 +42,12 @@ def test_protected_chat():
     data = json.loads(login_resp.data)
     assert "token" in data
 
-
     token = data["token"]
 
-    # Acceso al endpoint protegido
     chat_resp = client.post("/chat", json={"message": "hola"}, headers={
         "Authorization": f"Bearer {token}"
     })
 
     assert chat_resp.status_code == 200
-    response_data = json.loads(chat_resp.data)
-    assert "response" in response_data
+    assert b"Respuesta simulada" in chat_resp.data
+
