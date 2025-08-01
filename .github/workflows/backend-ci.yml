@@ -26,7 +26,17 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
+
+    - name: Check if HuggingFace token is set
+      run: |
+        if [ -z "$HUGGINGFACE_TOKEN" ]; then
+          echo "Token not set"
+          exit 1
+        else
+          echo "Token is set"
+        fi
+
+
     - name: Run backend tests
-      env:
-        HUGGINGFACE_TOKEN: ${{ secrets.HUGGINGFACE_TOKEN }}
       run: pytest tests
+
