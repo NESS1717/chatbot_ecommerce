@@ -1,0 +1,67 @@
+import json
+from flask import Blueprint, request, jsonify
+import os
+from dotenv import load_dotenv
+from transformers import AutoTokenizer, AutoModelForCausalLM
+import torch
+from fuzzywuzzy import process
+
+load_dotenv()
+
+chat_bp = Blueprint('chat', __name__)
+
+# Cargar el token de Hugging Face desde el archivo .env
+HF_TOKEN = os.getenv("HUGGINGFACE_TOKEN")
+
+# Verificar que el token esté definido
+if not HF_TOKEN:
+    raise ValueError("Falta el token de Hugging Face. Asegúrate de definir HUGGINGFACE_TOKEN en tu archivo .env")
+
+# Nombre del modelo
+MODEL_NAME = "google/gemma-2b-it"
+
+# Autenticación con Hugging Face
+tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME, token=HF_TOKEN)
+model = AutoModelForCausalLM.from_pretrained(MODEL_NAME, token=HF_TOKEN)
+
+
+# Cargar base de conocimiento
+with open('knowledge_base.json', 'r', encoding='utf-8') as f:
+    knowledge_base = json.load(f)
+
+def buscar_contexto(mensaje_usuario):
+    preguntas = [item['question'] for item in knowledge_base]
+    mejor_match, score = process.extractOne(mensaje_usuario, preguntas)
+    if score > 60:  # umbral para considerar relevante
+        for item in knowledge_base:
+            if item['question'] == mejor_match:
+                return item['answer']
+    return ""
+
+@chat_bp.route('/chat', methods=['POST'])
+def chat():
+    data = request.get_json()
+    message = data.get("message")
+
+    if not message:
+        return jsonify({"error": "Falta el mensaje"}), 400
+
+    try:
+        contexto = buscar_contexto(message)
+        prompt = f"Información relevante: {contexto}\nUsuario: {message}\nAsistente:"
+        ##prompt = f"Usuario: {message}\nAsistente:"
+        inputs = tokenizer(prompt, return_tensors="pt")
+
+        with torch.no_grad():
+            outputs = model.generate(**inputs, max_new_tokens=100, do_sample=True)
+
+        response_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
+
+        # Extraer solo la respuesta del asistente
+        if "Asistente:" in response_text:
+            response_text = response_text.split("Asistente:")[-1].strip()
+
+        return jsonify({"response": response_text})
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500

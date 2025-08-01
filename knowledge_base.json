@@ -1,0 +1,30 @@
+[
+  {
+    "question": "¿Tienen ropa deportiva para mujeres?",
+    "answer": "Sí, contamos con una amplia variedad de ropa deportiva para mujeres, incluyendo leggings, tops y chaquetas."
+  },
+  {
+    "question": "¿Cuáles son los métodos de pago disponibles?",
+    "answer": "Aceptamos tarjetas de crédito, débito, y pago mediante PayPal."
+  },
+  {
+    "question": "¿Hacen envíos internacionales?",
+    "answer": "Actualmente realizamos envíos solo dentro del país."
+  },
+  {
+    "question": "¿Cuál es la política de devoluciones?",
+    "answer": "Aceptamos devoluciones dentro de los 30 días posteriores a la compra, siempre que los productos estén en su estado original."
+  },
+  {
+    "question": "¿Tienen tallas grandes disponibles?",
+    "answer": "Sí, ofrecemos tallas grandes en varias de nuestras colecciones."
+  },
+  {
+    "question": "¿Puedo rastrear mi pedido?",
+    "answer": "Sí, una vez que su pedido haya sido enviado, le proporcionaremos un número de seguimiento."
+  },
+  {
+    "question": "¿Ofrecen descuentos para estudiantes?",
+    "answer": "Sí, ofrecemos un descuento del 10% para estudiantes con identificación válida."
+  }
+]
