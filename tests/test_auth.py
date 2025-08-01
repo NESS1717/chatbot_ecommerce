@@ -3,6 +3,7 @@ import sys
 import os
 import pytest
 
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from app import app
@@ -25,7 +26,7 @@ def test_register_and_login():
 # Aquí hacemos patch directo al método chat para que devuelva una respuesta simulada.
 from unittest.mock import patch
 
-@patch("routes.chat.chat")  # Patch al endpoint chat en routes/chat.py
+@patch("routes.chat.send_to_huggingface")  # Patch al endpoint chat en routes/chat.py
 def test_protected_chat(mock_chat):
     # Configuramos el mock para que devuelva una respuesta JSON con status_code 200
     mock_chat.return_value = (json.dumps({"response": "Respuesta simulada"}), 200, {"Content-Type": "application/json"})
