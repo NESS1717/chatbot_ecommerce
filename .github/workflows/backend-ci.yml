@@ -27,4 +27,6 @@ jobs:
         pip install -r requirements.txt
 
     - name: Run backend tests
+      env:
+        HUGGINGFACE_TOKEN: ${{ secrets.HUGGINGFACE_TOKEN }}
       run: pytest tests
