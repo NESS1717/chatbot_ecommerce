@@ -2,32 +2,32 @@ import json
 from flask import Blueprint, request, jsonify
 import os
 from dotenv import load_dotenv
-from transformers import AutoTokenizer, AutoModelForCausalLM
-import torch
 from fuzzywuzzy import process
 
 load_dotenv()
 
 chat_bp = Blueprint('chat', __name__)
 
-# Cargar el token de Hugging Face desde variable de entorno
 HF_TOKEN = os.getenv("HUGGINGFACE_TOKEN")
-
 MODEL_NAME = "google/gemma-2b-it"
+tokenizer = None
+model = None
 
-if HF_TOKEN:
-    # Si existe el token, cargar el tokenizer y el modelo
-    tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME, token=HF_TOKEN)
-    model = AutoModelForCausalLM.from_pretrained(MODEL_NAME, token=HF_TOKEN)
-else:
-    # Si no hay token, no cargar modelo para evitar errores en tests u otros entornos
-    tokenizer = None
-    model = None
-    print("⚠️ WARNING: HUGGINGFACE_TOKEN no está definido. El endpoint /chat no funcionará correctamente sin el token.")
+def cargar_modelo():
+    global tokenizer, model
+    if HF_TOKEN:
+        from transformers import AutoTokenizer, AutoModelForCausalLM
+        import torch
+        tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME, token=HF_TOKEN)
+        model = AutoModelForCausalLM.from_pretrained(MODEL_NAME, token=HF_TOKEN)
+    else:
+        print("⚠️ WARNING: HUGGINGFACE_TOKEN no está definido.")
 
-# Cargar base de conocimiento
-with open('knowledge_base.json', 'r', encoding='utf-8') as f:
-    knowledge_base = json.load(f)
+try:
+    with open('knowledge_base.json', 'r', encoding='utf-8') as f:
+        knowledge_base = json.load(f)
+except FileNotFoundError:
+    knowledge_base = []
 
 def buscar_contexto(mensaje_usuario):
     preguntas = [item['question'] for item in knowledge_base]
@@ -39,6 +39,9 @@ def buscar_contexto(mensaje_usuario):
     return ""
 
 def send_to_huggingface(prompt):
+    import torch
+    if not tokenizer or not model:
+        cargar_modelo()
     inputs = tokenizer(prompt, return_tensors="pt")
     with torch.no_grad():
         outputs = model.generate(**inputs, max_new_tokens=100, do_sample=True)
@@ -49,7 +52,7 @@ def send_to_huggingface(prompt):
 
 @chat_bp.route('/chat', methods=['POST'])
 def chat():
-    if not tokenizer or not model:
+    if not HF_TOKEN:
         return jsonify({"error": "El token de Hugging Face no está configurado. Servicio no disponible."}), 503
 
     data = request.get_json()
@@ -61,11 +64,9 @@ def chat():
     try:
         contexto = buscar_contexto(message)
         prompt = f"Información relevante: {contexto}\nUsuario: {message}\nAsistente:"
-
         response_text = send_to_huggingface(prompt)
-
         return jsonify({"response": response_text})
-
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 
