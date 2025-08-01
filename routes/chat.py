@@ -14,15 +14,22 @@ chat_bp = Blueprint('chat', __name__)
 HF_TOKEN = os.getenv("HUGGINGFACE_TOKEN")
 
 # Verificar que el token esté definido
-if not HF_TOKEN:
-    raise ValueError("Falta el token de Hugging Face. Asegúrate de definir HUGGINGFACE_TOKEN en tu archivo .env")
+#####if not HF_TOKEN:
+ #####   raise ValueError("Falta el token de Hugging Face. Asegúrate de definir HUGGINGFACE_TOKEN en tu archivo .env")
 
 # Nombre del modelo
 MODEL_NAME = "google/gemma-2b-it"
 
 # Autenticación con Hugging Face
-tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME, token=HF_TOKEN)
-model = AutoModelForCausalLM.from_pretrained(MODEL_NAME, token=HF_TOKEN)
+if HF_TOKEN:
+    # Si existe el token, cargar el tokenizer y el modelo
+    tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME, token=HF_TOKEN)
+    model = AutoModelForCausalLM.from_pretrained(MODEL_NAME, token=HF_TOKEN)
+else:
+    # Si no hay token, no cargar modelo para evitar errores en tests u otros entornos
+    tokenizer = None
+    model = None
+    print("⚠️ WARNING: HUGGINGFACE_TOKEN no está definido. El endpoint /chat no funcionará correctamente sin el token.")
 
 
 # Cargar base de conocimiento
