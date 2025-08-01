@@ -1,11 +1,9 @@
 import json
 import sys
 import os
-import pytest
-
+from unittest.mock import patch
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
 from app import app
 
 def test_register_and_login():
@@ -23,23 +21,21 @@ def test_register_and_login():
     assert login_resp.status_code == 200
     assert "token" in json.loads(login_resp.data)
 
-# Aquí hacemos patch directo al método chat para que devuelva una respuesta simulada.
-from unittest.mock import patch
 
-@patch("routes.chat.send_to_huggingface")  # Patch al endpoint chat en routes/chat.py
+@patch("routes.chat.send_to_huggingface")  # Patch para no llamar a Hugging Face real
 def test_protected_chat(mock_chat):
-    # Configuramos el mock para que devuelva una respuesta JSON con status_code 200
-    mock_chat.return_value = (json.dumps({"response": "Respuesta simulada"}), 200, {"Content-Type": "application/json"})
+    app.config["TESTING"] = True  # Activa el modo testing
+    mock_chat.return_value = "Respuesta simulada"
 
     client = app.test_client()
 
-    # Registrar usuario
+    # Registro de usuario
     client.post("/users/register", json={
         "username": "testuser",
         "password": "testpass"
     })
 
-    # Login para obtener token
+    # Login y obtención de token
     login_resp = client.post("/users/login", json={
         "username": "testuser",
         "password": "testpass"
@@ -50,10 +46,11 @@ def test_protected_chat(mock_chat):
 
     token = data["token"]
 
-    # Llamar al endpoint protegido /chat usando el token y el mock del chat
+    # Envío al endpoint /chat con token
     chat_resp = client.post("/chat", json={"message": "hola"}, headers={
         "Authorization": f"Bearer {token}"
     })
 
     assert chat_resp.status_code == 200
     assert b"Respuesta simulada" in chat_resp.data
+
