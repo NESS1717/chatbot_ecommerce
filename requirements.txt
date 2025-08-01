@@ -6,3 +6,4 @@ torch
 fuzzywuzzy
 python-Levenshtein
 pytest
+PyJWT
