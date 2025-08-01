@@ -38,6 +38,15 @@ def buscar_contexto(mensaje_usuario):
                 return item['answer']
     return ""
 
+def send_to_huggingface(prompt):
+    inputs = tokenizer(prompt, return_tensors="pt")
+    with torch.no_grad():
+        outputs = model.generate(**inputs, max_new_tokens=100, do_sample=True)
+    response_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
+    if "Asistente:" in response_text:
+        response_text = response_text.split("Asistente:")[-1].strip()
+    return response_text
+
 @chat_bp.route('/chat', methods=['POST'])
 def chat():
     if not tokenizer or not model:
@@ -52,17 +61,11 @@ def chat():
     try:
         contexto = buscar_contexto(message)
         prompt = f"Información relevante: {contexto}\nUsuario: {message}\nAsistente:"
-        inputs = tokenizer(prompt, return_tensors="pt")
 
-        with torch.no_grad():
-            outputs = model.generate(**inputs, max_new_tokens=100, do_sample=True)
-
-        response_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
-
-        if "Asistente:" in response_text:
-            response_text = response_text.split("Asistente:")[-1].strip()
+        response_text = send_to_huggingface(prompt)
 
         return jsonify({"response": response_text})
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
