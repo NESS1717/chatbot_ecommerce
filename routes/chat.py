@@ -9,43 +9,56 @@ from utils.huggingface import send_to_huggingface
 
 chat_bp = Blueprint('chat', __name__)
 
-# Carga del modelo si existe el token
+# Token esperado en variable de entorno
 hf_token = os.getenv("HUGGINGFACEHUB_API_TOKEN")
+MODEL_NAME = "google/gemma-2b-it"
 
-tokenizer = None
-model = None
+##tokenizer = None
+##model = None
 
 if hf_token:
-    tokenizer = AutoTokenizer.from_pretrained("tiiuae/falcon-7b-instruct", token=hf_token)
-    model = AutoModelForCausalLM.from_pretrained(
-        "tiiuae/falcon-7b-instruct",
-        token=hf_token,
-        torch_dtype=torch.float16,
-        trust_remote_code=True,
-        device_map="auto"
-    )
+    print("✅ Token Hugging Face encontrado. Cargando modelo...")
+    try:
+        tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME, token=hf_token)
+        model = AutoModelForCausalLM.from_pretrained(MODEL_NAME, token=hf_token,
+            torch_dtype=torch.float16,
+            trust_remote_code=True,
+            device_map="auto"
+        )
+        print("✅ Modelo cargado correctamente.")
+    except Exception as e:
+        print(f"❌ Error cargando el modelo: {e}")
+        tokenizer = None
+        model = None
+else:
+    print("⚠️ WARNING: No se encontró HUGGINGFACEHUB_API_TOKEN, modelo no cargado.")
 
 @chat_bp.route('/chat', methods=['POST'])
 @jwt_required()
 def chat():
     data = request.get_json()
-    message = data.get("message")
+    print(f"[DEBUG] Data recibida: {data}")
+    message = data.get("message") if data else None
+    print(f"[DEBUG] Message recibido: {message}")
 
     if not message:
+        print("[ERROR] No se recibió el mensaje en el request.")
         return jsonify({"error": "Falta el mensaje"}), 400
 
     try:
         contexto = buscar_contexto(message)
         prompt = f"Información relevante: {contexto}\nUsuario: {message}\nAsistente:"
 
-        # Si estamos en testing y no hay modelo cargado, devolvemos una respuesta simulada
+        # En modo test, si no hay modelo, devolver respuesta simulada para no fallar tests
         if (not tokenizer or not model) and current_app.config.get("TESTING", False):
             return jsonify({"response": "Respuesta simulada"}), 200
 
+        # Si no hay modelo y no estamos en test, error 503
         if not tokenizer or not model:
             return jsonify({"error": "El token de Hugging Face no está configurado. Servicio no disponible."}), 503
 
-        response_text = send_to_huggingface(prompt)
+        # Usar la función que llama al modelo real, pasando modelo y tokenizer
+        response_text = send_to_huggingface(prompt, model, tokenizer)
 
         return jsonify({"response": response_text})
 
