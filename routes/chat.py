@@ -7,6 +7,10 @@ import os
 from utils.context import buscar_contexto
 from utils.huggingface import send_to_huggingface
 
+
+tokenizer = None
+model = None
+
 chat_bp = Blueprint('chat', __name__)
 
 # Token esperado en variable de entorno
@@ -63,6 +67,9 @@ def chat():
         return jsonify({"response": response_text})
 
     except Exception as e:
+        import traceback
+        print("[ERROR] Excepción en /chat:", e)
+        traceback.print_exc()
         return jsonify({"error": str(e)}), 500
 
 

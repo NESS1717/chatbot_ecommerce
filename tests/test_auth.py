@@ -20,7 +20,7 @@ def test_register_and_login():
 
     login_resp = client.post("/users/login", json=user_data)
     assert login_resp.status_code == 200
-    assert "token" in json.loads(login_resp.data)
+    assert "access_token" in json.loads(login_resp.data)
 
 @patch("routes.chat.send_to_huggingface")  # Patch para no llamar a Hugging Face real
 def test_protected_chat(mock_chat):
@@ -42,16 +42,15 @@ def test_protected_chat(mock_chat):
         })
         assert login_resp.status_code == 200
         data = json.loads(login_resp.data)
-        assert "token" in data
+    assert "access_token" in data
+    token = data["access_token"]
 
-        token = data["token"]
+    # Envío al endpoint /chat con token
+    chat_resp = client.post("/chat", json={"message": "hola"}, headers={
+        "Authorization": f"Bearer {token}"
+    })
 
-        # Envío al endpoint /chat con token
-        chat_resp = client.post("/chat", json={"message": "hola"}, headers={
-            "Authorization": f"Bearer {token}"
-        })
-
-        assert chat_resp.status_code == 200
-        assert b"Respuesta simulada" in chat_resp.data
+    assert chat_resp.status_code == 200
+    assert b"Respuesta simulada" in chat_resp.data
 
 
