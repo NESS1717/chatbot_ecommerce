@@ -1,0 +1,20 @@
+# Dockerfile para chatbot_ecommerce Flask
+FROM python:3.13-slim
+
+# Establecer el directorio de trabajo
+WORKDIR /app
+
+# Copiar los archivos del proyecto
+COPY . /app
+
+# Instalar dependencias
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Exponer el puerto (ajusta si usas otro)
+EXPOSE 5000
+
+# Variable de entorno para producción
+ENV FLASK_ENV=production
+
+# Comando para ejecutar la app
+CMD ["python", "app.py"]

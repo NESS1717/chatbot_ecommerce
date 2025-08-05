@@ -1,0 +1,30 @@
+name: Build and Deploy to Azure
+
+on:
+  push:
+    branches:
+      - master  # o 'master', depende cómo se llame tu rama principal
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Log in to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Build and push Docker image to Azure Container Registry (if using ACR)
+        run: echo "Si usas ACR, este paso se modifica. Por ahora desplegaremos directo."
+
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: chatbot-flask-app  # cambia esto al nombre exacto de tu Web App en Azure
+          slot-name: production
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: .
