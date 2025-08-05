@@ -1,0 +1,36 @@
+name: Build Deploy Azure
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-test-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Login to Azure
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Build Docker image
+      run: docker build -t chatbotearc.azurecr.io/chatbot:latest .
+
+    - name: Login to ACR
+      run: az acr login --name chatbotearc
+
+    - name: Push image to ACR
+      run: |
+        docker tag chatbotearc.azurecr.io/chatbot:latest chatbotearc.azurecr.io/chatbot:latest
+        docker push chatbotearc.azurecr.io/chatbot:latest
+
+    - name: Deploy to Azure Web App
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: chatbot-appservice
+        images: chatbotearc.azurecr.io/chatbot:latest

@@ -3,7 +3,7 @@ name: Build and Deploy to Azure
 on:
   push:
     branches:
-      - master  # o 'master', depende cómo se llame tu rama principal
+      - master  # o main si es tu rama principal
 
 jobs:
   build-and-deploy:
@@ -18,13 +18,19 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Build and push Docker image to Azure Container Registry (if using ACR)
-        run: echo "Si usas ACR, este paso se modifica. Por ahora desplegaremos directo."
+      - name: Log in to ACR
+        run: |
+          echo "${{ secrets.REGISTRY_PASSWORD }}" | docker login chatbotearc.azurecr.io -u ${{ secrets.REGISTRY_USERNAME }} --password-stdin
 
-      - name: Deploy to Azure Web App
+      - name: Build and push Docker image to ACR
+        run: |
+          docker build -t chatbotearc.azurecr.io/chatbot:latest .
+          docker push chatbotearc.azurecr.io/chatbot:latest
+
+      - name: Deploy to Azure Web App (Container)
         uses: azure/webapps-deploy@v2
         with:
-          app-name: chatbot-flask-app  # cambia esto al nombre exacto de tu Web App en Azure
+          app-name: chatbot-flask-app  # ⚠️ Cambia esto si tu Web App se llama diferente
           slot-name: production
-          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          package: .
+          images: chatbotearc.azurecr.io/chatbot:latest
+
