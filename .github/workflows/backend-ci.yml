@@ -57,7 +57,7 @@ jobs:
 
     - name: Build and push Docker image
       run: |
-        IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/chatbot:latest
+        IMAGE_NAME=ghcr.io/${{ github.repository_owner,,  }}/chatbot:latest
         docker build -t $IMAGE_NAME .
         docker push $IMAGE_NAME
 
