@@ -10,3 +10,4 @@ pytest
 PyJWT
 accelerate
 gunicorn
+requests
