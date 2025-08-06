@@ -11,11 +11,11 @@ COPY . /app
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Exponer el puerto (ajusta si usas otro)
-EXPOSE 80
+EXPOSE 8000
 
 # Variable de entorno para producción
 ENV FLASK_ENV=production
 
 # Comando para ejecutar la app
-###CMD ["python", "app.py"]  SOLO PARA LOCAL Y COMENTAR EL SIGUIENTE
-CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:80", "app:app"]  
+CMD ["python", "app.py"]  SOLO PARA LOCAL Y COMENTAR EL SIGUIENTE
+##CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:80", "app:app"]  
