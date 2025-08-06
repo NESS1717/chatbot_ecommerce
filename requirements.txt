@@ -9,4 +9,4 @@ python-Levenshtein
 pytest
 PyJWT
 accelerate
-
+gunicorn

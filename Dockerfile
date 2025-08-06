@@ -17,4 +17,5 @@ EXPOSE 80
 ENV FLASK_ENV=production
 
 # Comando para ejecutar la app
-CMD ["python", "app.py"]
+###CMD ["python", "app.py"]  SOLO PARA LOCAL Y COMENTAR EL SIGUIENTE
+CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:80", "app:app"]  
