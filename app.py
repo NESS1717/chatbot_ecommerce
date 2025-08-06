@@ -7,6 +7,7 @@ from flask_cors import CORS
 from flask_jwt_extended import JWTManager  # Importa JWTManager
 
 load_dotenv()
+hf_token = os.getenv("HUGGINGFACEHUB_API_TOKEN")
 print("TOKEN HUGGINGFACE:", os.getenv("HUGGINGFACEHUB_API_TOKEN"))
 
 app = Flask(__name__)
