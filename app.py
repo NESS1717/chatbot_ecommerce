@@ -27,5 +27,5 @@ app.register_blueprint(chat_bp)
 ##if __name__ == '__main__': ###para local
    ### app.run(debug=True)   ###para local
 
-if __name__ == '__main__':  ###activo para azure
-    app.run(host='0.0.0.0', port=80)  ###activo para azure
+##if __name__ == '__main__':  ###activo para azure NO USAR
+  ##  app.run(host='0.0.0.0', port=80)  ###activo para azure NO USAR
