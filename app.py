@@ -12,7 +12,7 @@ print("TOKEN HUGGINGFACE:", os.getenv("HUGGINGFACEHUB_API_TOKEN"))
 app = Flask(__name__)
 CORS(app)
 
-# Configuraciones para JWT
+# Configuraciones para JWT.
 ##app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'clave_por_defecto')
 app.config["JWT_SECRET_KEY"] = os.getenv('JWT_SECRET_KEY', 'clave_jwt_por_defecto')  # Clave para JWT
 ##app.config["JWT_TOKEN_LOCATION"] = ["headers"]  # De dónde se toman los tokens
