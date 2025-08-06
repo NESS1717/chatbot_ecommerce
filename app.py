@@ -24,8 +24,8 @@ jwt = JWTManager(app)  # Inicializa JWT con la app
 app.register_blueprint(users_bp)
 app.register_blueprint(chat_bp)
 
-if __name__ == '__main__': ###para local
-   app.run(debug=True)   ###para local
+##if __name__ == '__main__': ###para local
+  ## app.run(debug=True)   ###para local
 
 #if __name__ == "__main__":
  #   import os
