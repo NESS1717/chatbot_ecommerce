@@ -28,7 +28,7 @@ MODEL_NAME = "google/flan-t5-base"
 if hf_token:
     print("✅ Token Hugging Face encontrado. Cargando modelo...")
     try:
-        ###tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME, token=hf_token)
+        tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME, token=hf_token)
         ###model = AutoModelForCausalLM.from_pretrained(MODEL_NAME, token=hf_token,
             ###torch_dtype=torch.float16,
             ###trust_remote_code=True,
