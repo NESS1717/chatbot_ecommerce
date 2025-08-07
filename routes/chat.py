@@ -1,6 +1,10 @@
+####cambie el modelo de gemma a flan-t5-base solo para prueba gb de uso
+####agregue 3 cambios aca  con###
+
 from flask import Blueprint, request, jsonify, current_app
 from flask_jwt_extended import jwt_required
-from transformers import AutoTokenizer, AutoModelForCausalLM
+###from transformers import AutoTokenizer, AutoModelForCausalLM
+from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 import torch
 import os
 
@@ -15,7 +19,8 @@ chat_bp = Blueprint('chat', __name__)
 
 # Token esperado en variable de entorno
 hf_token = os.getenv("HUGGINGFACEHUB_API_TOKEN")
-MODEL_NAME = "google/gemma-2b-it"
+###MODEL_NAME = "google/gemma-2b-it"
+MODEL_NAME = "google/flan-t5-base"
 
 ##tokenizer = None
 ##model = None
@@ -23,12 +28,14 @@ MODEL_NAME = "google/gemma-2b-it"
 if hf_token:
     print("✅ Token Hugging Face encontrado. Cargando modelo...")
     try:
-        tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME, token=hf_token)
-        model = AutoModelForCausalLM.from_pretrained(MODEL_NAME, token=hf_token,
-            torch_dtype=torch.float16,
-            trust_remote_code=True,
-            device_map="auto"
-        )
+        ###tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME, token=hf_token)
+        ###model = AutoModelForCausalLM.from_pretrained(MODEL_NAME, token=hf_token,
+            ###torch_dtype=torch.float16,
+            ###trust_remote_code=True,
+            ###device_map="auto")
+        model = AutoModelForSeq2SeqLM.from_pretrained(MODEL_NAME, token=hf_token)
+
+
         print("✅ Modelo cargado correctamente.")
     except Exception as e:
         print(f"❌ Error cargando el modelo: {e}")
