@@ -11,7 +11,7 @@ COPY . /app
 RUN pip install --no-cache-dir -r requirements.txt
 
 # 👉 DESCARGA EL MODELO DURANTE EL BUILD
-RUN python -c "from transformers import AutoModelForCausalLM, AutoTokenizer; AutoModelForCausalLM.from_pretrained('tiiuae/falcon-7b-instruct'); AutoTokenizer.from_pretrained('tiiuae/falcon-7b-instruct')"
+##RUN python -c "from transformers import AutoModelForCausalLM, AutoTokenizer; AutoModelForCausalLM.from_pretrained('tiiuae/falcon-7b-instruct'); AutoTokenizer.from_pretrained('tiiuae/falcon-7b-instruct')"
 
 
 # Exponer el puerto (ajusta si usas otro)
