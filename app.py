@@ -5,10 +5,14 @@ from dotenv import load_dotenv
 import os
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager  # Importa JWTManager
+from pathlib import Path
 
-load_dotenv()
-hf_token = os.getenv("HUGGINGFACEHUB_API_TOKEN")
-print("TOKEN HUGGINGFACE:", os.getenv("HUGGINGFACEHUB_API_TOKEN"))
+###load_dotenv()
+dotenv_path = Path(__file__).parent / ".env"
+load_dotenv(dotenv_path)
+print("📢 TOKEN HUGGINGFACE:", os.getenv("HUGGINGFACEHUB_API_TOKEN"))
+###hf_token = os.getenv("HUGGINGFACEHUB_API_TOKEN")
+###print("TOKEN HUGGINGFACE:", os.getenv("HUGGINGFACEHUB_API_TOKEN"))
 
 app = Flask(__name__)
 CORS(app)
@@ -26,7 +30,7 @@ app.register_blueprint(users_bp)
 app.register_blueprint(chat_bp)
 
 ##if __name__ == '__main__': ###para local
-  ## app.run(debug=True)   ###para local
+  ##app.run(debug=True)   ###para local
 
 if __name__ == "__main__":
   import os

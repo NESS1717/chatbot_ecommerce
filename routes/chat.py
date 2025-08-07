@@ -5,12 +5,14 @@ from flask import Blueprint, request, jsonify, current_app
 from flask_jwt_extended import jwt_required
 ###from transformers import AutoTokenizer, AutoModelForCausalLM
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
+from dotenv import load_dotenv
 import torch
 import os
 
 from utils.context import buscar_contexto
 from utils.huggingface import send_to_huggingface
 
+load_dotenv()
 
 tokenizer = None
 model = None
