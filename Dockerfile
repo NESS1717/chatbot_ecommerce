@@ -17,7 +17,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 RUN chmod +x startup.sh
 
 # Exponer el puerto (ajusta si usas otro)
-####EXPOSE 5000
+EXPOSE 80
 
 # Variable de entorno para producción
 ENV FLASK_ENV=production
