@@ -30,3 +30,5 @@ spec:
             secretKeyRef:
               name: chatbot-secrets
               key: JWT_SECRET_KEY
+        - name: PORT
+          value: "80"
