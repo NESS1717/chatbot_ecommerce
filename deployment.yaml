@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chatbot-deployment
+  labels:
+    app: chatbot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: chatbot
+  template:
+    metadata:
+      labels:
+        app: chatbot
+    spec:
+      containers:
+      - name: chatbot-container
+        image: ghcr.io/ness1717/chatbot:latest
+        ports:
+        - containerPort: 80
+        env:
+        - name: HUGGINGFACEHUB_API_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: chatbot-secrets
+              key: HUGGINGFACEHUB_API_TOKEN
+        - name: JWT_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: chatbot-secrets
+              key: JWT_SECRET_KEY
